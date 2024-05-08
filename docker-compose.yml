@@ -9,7 +9,7 @@ services:
     ports:
       - "1433:1433"
     container_name: gameLibrary
-    restart: always
+    restart: always 
 
   business:
     image: business
