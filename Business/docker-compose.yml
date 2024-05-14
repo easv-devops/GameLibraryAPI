@@ -20,3 +20,4 @@ services:
       - ./db:/flyway/conf
     depends_on:
       - app-database
+    
