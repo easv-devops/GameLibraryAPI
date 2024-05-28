@@ -1,10 +1,7 @@
 version: '3.8'
 services:
   business:
-    build:
-      context: ..
-      dockerfile: Business/Dockerfile
-    image: magnusandersen/business-app:latest
+    image: magnusandersen/gamelibrary:latest
     restart: always
     environment:
       - DATABASE_HOST=app-database
