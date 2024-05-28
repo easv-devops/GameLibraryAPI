@@ -1,6 +1,18 @@
-version: "3.3"
-
+version: '3.8'
 services:
+  business:
+    build:
+      context: ..
+      dockerfile: Business/Dockerfile
+    image: magnusandersen/business-app:latest
+    restart: always
+    environment:
+      - DATABASE_HOST=app-database
+    depends_on:
+      - app-database
+    ports:
+      - 8080:80
+
   app-database:
     image: mysql
     restart: always
@@ -11,7 +23,7 @@ services:
       MYSQL_DATABASE: GameLib
     ports:
       - 63306:3306
-        
+
   flyway:
     image: flyway/flyway:10
     command: migrate
@@ -20,4 +32,3 @@ services:
       - ./db:/flyway/conf
     depends_on:
       - app-database
-    
