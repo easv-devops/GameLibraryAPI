@@ -63,7 +63,7 @@ public class GameController : ControllerBase
                 cmd.Connection = sqlConnection;
         
                 sqlConnection.Open();
-                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery(); //Hej
             } 
         }
     }
