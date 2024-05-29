@@ -9,6 +9,8 @@ services:
       - app-database
     ports:
       - 5001:8080
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
   app-database:
     image: mysql
@@ -29,3 +31,16 @@ services:
       - ./db:/flyway/conf
     depends_on:
       - app-database
+        
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --debug --http-api-update
+    environment:
+      - WATCHTOWER_HTTP_API_TOKEN=mytoken
+      - WATCHTOWER_LABEL_ENABLE=true
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    ports:
+      - 8080:8080
