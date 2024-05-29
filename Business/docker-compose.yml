@@ -8,7 +8,7 @@ services:
     depends_on:
       - app-database
     ports:
-      - 8080:80
+      - 5001:8080
 
   app-database:
     image: mysql
