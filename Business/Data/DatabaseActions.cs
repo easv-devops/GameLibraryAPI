@@ -8,7 +8,7 @@ public class DatabaseActions
 
     public DatabaseActions()
     {
-        connectionString = "";
+        connectionString = "Server=localhost;Port=63306;Database=GameLib;Uid=root;Pwd=MY_S€cr€t_P@ssw0rD;";
     }
 
     public String getDBString()
