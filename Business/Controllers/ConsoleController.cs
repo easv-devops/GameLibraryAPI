@@ -53,7 +53,48 @@ namespace GameLibraryAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        
+        [HttpGet("{id}")]
+        public IActionResult GetConsole(Guid consoleId)
+        {
+            try
+            {
+                using (MySqlConnection sqlConnection = new MySqlConnection(_db.getDBString()))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = "SELECT * FROM Console WHERE ConsoleId = @ConsoleId";
+                        cmd.Parameters.AddWithValue("@ConsoleId", consoleId);
+                        cmd.Connection = sqlConnection;
+
+                        sqlConnection.Open();
+                        MySqlDataReader reader = cmd.ExecuteReader();
+
+                        var consoles = new List<Console>();
+                        while (reader.Read())
+                        {
+                            var console = new Console
+                            {
+                                ConsoleId = reader["ConsoleId"].ToString(),
+                                ConsoleName = reader["ConsoleName"].ToString()
+                            };
+                            consoles.Add(console);
+                        }
+
+                        return Ok(consoles);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
+    
+    
+    
 
     public class Console
     {
