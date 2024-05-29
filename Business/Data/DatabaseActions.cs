@@ -1,5 +1,6 @@
 namespace GameLibraryAPI.Data;
 
+using MySql.Data.MySqlClient;
 using System.Data.SqlClient;
 
 public class DatabaseActions

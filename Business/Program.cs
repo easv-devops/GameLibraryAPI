@@ -1,4 +1,6 @@
 
+using GameLibraryAPI.Data;
+
 public class Program
 {
     public static void Main(string[] args)
@@ -13,6 +15,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddCors();
+        builder.Services.AddSingleton<DatabaseActions>();
 
         var app = builder.Build();
 
