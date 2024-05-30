@@ -59,16 +59,10 @@ steps:
   - name: performance tests
     image: grafana/k6
     commands:
-      - k6 run test/performance/spike.js
+      - k6 run GameLibraryAPI Test/PerformanceTests/spiketest.js
     depends_on:
       - update database
 
-  - name: end-to-end tests
-    image: testcafe/testcafe
-    commands:
-      - testcafe chromium:headless test/e2e/count-forecasts.js
-    depends_on:
-      - update database
 
 ---
 
