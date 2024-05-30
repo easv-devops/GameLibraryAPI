@@ -1,19 +1,19 @@
 kind: pipeline
 type: docker
 name: integration
- 
+
 steps:
   - name: code-analysis
-      image: boulundeasv/dotnet-sdk-with-java
-      environment:
-        SONARSECRET:
-          from_secret: SonarCubeToken
-        SONARKEY:
-          from_secret: SonarCubeKey
-      commands:
-        - dotnet sonarscanner begin /k:"$SONARKEY" /d:sonar.host.url="http://sonar.setgo.dk:9000"  /d:sonar.token="$SONARSECRET"
-        - dotnet build
-        - dotnet sonarscanner end /d:sonar.token="$SONARSECRET"
+    image: boulundeasv/dotnet-sdk-with-java
+    environment:
+      SONARSECRET:
+        from_secret: SonarCubeToken
+      SONARKEY:
+        from_secret: SonarCubeKey
+    commands:
+      - dotnet sonarscanner begin /k:"$SONARKEY" /d:sonar.host.url="http://sonar.setgo.dk:9000"  /d:sonar.token="$SONARSECRET"
+      - dotnet build
+      - dotnet sonarscanner end /d:sonar.token="$SONARSECRET"
 
 ---
 
@@ -48,11 +48,7 @@ steps:
   - name: update database
     image: flyway/flyway
     commands:
-      - flyway migrate
-          -url=jdbc:mysql://45.90.123.95:63306/GameLib
-          -user=root
-          -password=MY_S€cr€t_P@ssw0rD
-          -locations=filesystem:./db/sql
+      - flyway migrate -url=jdbc:mysql://45.90.123.95:63306/GameLib -user=root -password=MY_S€cr€t_P@ssw0rD -locations=filesystem:./db/sql
     depends_on:
       - trigger update
 
@@ -63,7 +59,6 @@ steps:
     depends_on:
       - update database
 
-
 ---
 
 kind: pipeline
@@ -71,8 +66,8 @@ type: docker
 name: deploy
 depends_on:
   - deliver
-    
-steps: # IMPORTANT: Allow Drone to run the first two steps 
+
+steps:
   - name: release api
     image: plugins/docker
     settings:
@@ -97,10 +92,6 @@ steps: # IMPORTANT: Allow Drone to run the first two steps
   - name: update database
     image: flyway/flyway
     commands:
-      - flyway migrate
-        -url=jdbc:mysql://45.90.123.96:63306/GameLib
-        -user=root
-        -password=MY_S€cr€t_P@ssw0rD
-        -locations=filesystem:./db/sql
+      - flyway migrate -url=jdbc:mysql://45.90.123.96:63306/GameLib -user=root -password=MY_S€cr€t_P@ssw0rD -locations=filesystem:./db/sql
     depends_on:
       - trigger update
