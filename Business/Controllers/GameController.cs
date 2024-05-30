@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using GameLibraryAPI.Data;
+using MySql.Data.MySqlClient;
 
 namespace GameLibraryAPI.Controllers;
 
@@ -9,63 +10,181 @@ namespace GameLibraryAPI.Controllers;
 [Route("[controller]")]
 public class GameController : ControllerBase
 {
-    private DatabaseActions db;
-    
-    [HttpPost(Name = "AddGame")]
-    public void AddGame(Guid gameId, String gameTitle, Guid consoleId, Guid genreId)
-    {
-        using (SqlConnection sqlConnection = new SqlConnection(db.getDBString()))
-        {
-            using (SqlCommand cmd = new SqlCommand())
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "INSERT INTO Game VALUES (@GameId, @GameTitle, @ConsoleId, @GenreId)";
-                cmd.Parameters.AddWithValue("@GameId", gameId);
-                cmd.Parameters.AddWithValue("@GameTitle", gameTitle);
-                cmd.Parameters.AddWithValue("@ConsoleId", consoleId);
-                cmd.Parameters.AddWithValue("@GenreId", genreId);
-                cmd.Connection = sqlConnection;
-        
-                sqlConnection.Open();
-                cmd.ExecuteNonQuery();
-            } 
-        }
-    }
+    private readonly DatabaseActions _db;
 
-    [HttpGet]
-    [Route("GetGames")]
-    public void getGames()
-    {
-        using (SqlConnection sqlConnection = new SqlConnection(db.getDBString()))
+        public GameController(DatabaseActions db)
         {
-            using (SqlCommand cmd = new SqlCommand())
-            {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "SELECT * FROM Game";
-                cmd.Connection = sqlConnection;
-        
-                sqlConnection.Open();
-                cmd.ExecuteNonQuery();
-            } 
+            _db = db;
         }
-    }
-    
-    [HttpGet("{id}")]
-    public void getGame(Guid gameId)
-    {
-        using (SqlConnection sqlConnection = new SqlConnection(db.getDBString()))
+
+        [HttpPost]
+        public IActionResult AddGame([FromBody] Game game)
         {
-            using (SqlCommand cmd = new SqlCommand())
+            try
             {
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.CommandText = "SELECT * FROM Game WHERE GameId = @GameId";
-                cmd.Parameters.AddWithValue("@GameId", gameId);
-                cmd.Connection = sqlConnection;
-        
-                sqlConnection.Open();
-                cmd.ExecuteNonQuery(); //Hej
-            } 
+                using (MySqlConnection sqlConnection = new MySqlConnection(_db.getDBString()))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = "INSERT INTO Game VALUES (@GameId, @GameTitle, @ConsoleId, @GenreId)";
+                        cmd.Parameters.AddWithValue("@GameId", game.gameId);
+                        cmd.Parameters.AddWithValue("@GameTitle", game.gameTitle);
+                        cmd.Parameters.AddWithValue("@ConsoleId", game.consoleId);
+                        cmd.Parameters.AddWithValue("@GenreId", game.genreId);
+                        cmd.Connection = sqlConnection;
+                        
+                        sqlConnection.Open();
+                        MySqlDataReader reader = cmd.ExecuteReader();
+
+                        var addedGame = new Game
+                        {
+                            gameId = reader["GameId"].ToString(),
+                            gameTitle = reader["GameTitle"].ToString(),
+                            consoleId = reader["ConsoleId"].ToString(),   
+                            genreId = reader["GenreId"].ToString()
+                        };
+
+                        return Ok(addedGame);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            
         }
-    }
+
+        [HttpGet]
+        [Route("GetGames")]
+        public IActionResult GetGames()
+        {
+            try
+            {
+                using (MySqlConnection sqlConnection = new MySqlConnection(_db.getDBString()))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = "SELECT * FROM Game";
+                        cmd.Connection = sqlConnection;
+
+                        sqlConnection.Open();
+                        MySqlDataReader reader = cmd.ExecuteReader();
+
+                        var games = new List<Game>();
+                        while (reader.Read())
+                        {
+                            var game = new Game
+                            {
+                                gameId = reader["GameId"].ToString(),
+                                gameTitle = reader["GameTitle"].ToString(),
+                                consoleId = reader["ConsoleId"].ToString(),   
+                                genreId = reader["GenreId"].ToString()
+                            };
+                            games.Add(game);
+                        }
+
+                        return Ok(games);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+        
+        [HttpGet("{id}")]
+        public IActionResult GetGame(Guid gameId)
+        {
+            try
+            {
+                using (MySqlConnection sqlConnection = new MySqlConnection(_db.getDBString()))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = "SELECT * FROM Game WHERE GameId = @GameId";
+                        cmd.Parameters.AddWithValue("@GameId", gameId);
+                        cmd.Connection = sqlConnection;
+
+                        sqlConnection.Open();
+                        MySqlDataReader reader = cmd.ExecuteReader();
+
+                        var games = new List<Game>();
+                        while (reader.Read())
+                        {
+                            var game = new Game
+                            {
+                                gameId = reader["GameId"].ToString(),
+                                gameTitle = reader["GameTitle"].ToString(),
+                                consoleId = reader["ConsoleId"].ToString(),   
+                                genreId = reader["GenreId"].ToString()
+                            };
+                            games.Add(game);
+                        }
+
+                        return Ok(games);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     
+        [HttpGet("GetGames/{id}")]
+        public IActionResult GetGameFromConsole(Guid consoleId)
+        {
+            try
+            {
+                using (MySqlConnection sqlConnection = new MySqlConnection(_db.getDBString()))
+                {
+                    using (MySqlCommand cmd = new MySqlCommand())
+                    {
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = "SELECT * FROM Game WHERE ConsoleId = @ConsoleId";
+                        cmd.Parameters.AddWithValue("@ConsoleId", consoleId);
+                        cmd.Connection = sqlConnection;
+
+                        sqlConnection.Open();
+                        MySqlDataReader reader = cmd.ExecuteReader();
+
+                        var games = new List<Game>();
+                        while (reader.Read())
+                        {
+                            var game = new Game
+                            {
+                                gameId = reader["GameId"].ToString(),
+                                gameTitle = reader["GameTitle"].ToString(),
+                                consoleId = reader["ConsoleId"].ToString(),   
+                                genreId = reader["GenreId"].ToString()
+                            };
+                            games.Add(game);
+                        }
+
+                        return Ok(games);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+    
+}
+
+public class Game
+{
+    public String gameId { get; set; }
+    
+    public String gameTitle { get; set; }
+    
+    public String consoleId { get; set; }
+    
+    public String genreId { get; set; }
 }
