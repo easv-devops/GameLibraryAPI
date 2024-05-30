@@ -1,4 +1,5 @@
-﻿**/.dockerignore
+# Ignore common system files and directories
+**/.dockerignore
 **/.env
 **/.git
 **/.gitignore
@@ -12,14 +13,36 @@
 **/*.dbmdl
 **/*.jfm
 **/azds.yaml
+
+# Ignore build directories
 **/bin
-**/charts
-**/docker-compose*
-**/Dockerfile*
+**/obj
+bin
+obj
+
+# Ignore node_modules and npm logs
 **/node_modules
 **/npm-debug.log
-**/obj
+
+# Ignore Helm charts
+**/charts
+
+# Ignore Docker-specific files
+**/docker-compose*
+**/Dockerfile*
+
+# Ignore secret and configuration files
 **/secrets.dev.yaml
 **/values.dev.yaml
+
+# Ignore documentation and readme files
 LICENSE
 README.md
+*.md
+
+# Ignore version control directories
+*.git
+*.gitignore
+
+# Ignore miscellaneous log files
+*.log
